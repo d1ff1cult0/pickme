@@ -82,7 +82,7 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ names, onSpinEnd }, ref) =>
         velocityRef.current *= 0.985;
         drawWheel();
 
-        if (velocityRef.current < 0.001) {
+        if (velocityRef.current < 0.0005) {
             spinningRef.current = false;
             const normalizedAngle = (2 * Math.PI - (angleOffsetRef.current % (2 * Math.PI))) % (2 * Math.PI);
             const step = (2 * Math.PI) / names.length;
@@ -111,6 +111,12 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ names, onSpinEnd }, ref) =>
 
     useEffect(() => {
         const handleResize = () => {
+            const canvas = canvasRef.current;
+            if (canvas) {
+                const size = Math.min(window.innerWidth, window.innerHeight);
+                canvas.width = size;
+                canvas.height = size;
+            }
             drawWheel();
         };
 
@@ -126,7 +132,7 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ names, onSpinEnd }, ref) =>
         };
     }, [drawWheel]);
 
-    return <canvas ref={canvasRef} className="border rounded shadow w-full h-full" />;
+    return <canvas ref={canvasRef} className="border h-full rounded shadow" />;
 });
 
 Wheel.displayName = 'Wheel';
