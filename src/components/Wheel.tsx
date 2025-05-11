@@ -82,11 +82,15 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ names, onSpinEnd }, ref) =>
         velocityRef.current *= 0.985;
         drawWheel();
 
-        if (velocityRef.current < 0.002) {
+        if (velocityRef.current < 0.001) {
             spinningRef.current = false;
             const normalizedAngle = (2 * Math.PI - (angleOffsetRef.current % (2 * Math.PI))) % (2 * Math.PI);
             const step = (2 * Math.PI) / names.length;
-            const index = Math.floor(normalizedAngle / step) % names.length;
+
+            // Adjust the angle by 90 degrees (Math.PI / 2)
+            const adjustedAngle = (normalizedAngle - Math.PI / 2) % (2 * Math.PI);
+            const index = Math.floor(adjustedAngle / step) % names.length;
+
             onSpinEnd(names[index]);
             return;
         }
