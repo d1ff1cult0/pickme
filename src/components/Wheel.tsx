@@ -22,12 +22,19 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ names, onSpinEnd }, ref) =>
         const ctx = canvas.getContext('2d');
         if (!ctx) return;
 
-        const size = Math.min(window.innerWidth * 0.7, window.innerHeight * 0.7);
+        const pixelRatio = window.devicePixelRatio || 1;
+        const size = Math.min(window.innerWidth, window.innerHeight);
         const radius = size / 2;
         const step = (2 * Math.PI) / Math.max(names.length, 1);
 
-        canvas.width = size;
-        canvas.height = size;
+        // Set canvas size for high DPI
+        canvas.width = size * pixelRatio;
+        canvas.height = size * pixelRatio;
+        canvas.style.width = `${size}px`;
+        canvas.style.height = `${size}px`;
+
+        // Scale the context
+        ctx.scale(pixelRatio, pixelRatio);
 
         ctx.clearRect(0, 0, size, size);
         ctx.save();
@@ -38,14 +45,13 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ names, onSpinEnd }, ref) =>
             const startAngle = i * step + angleOffsetRef.current;
             const endAngle = startAngle + step;
 
-            // Draw the segments
             ctx.beginPath();
             ctx.moveTo(0, 0);
             ctx.arc(0, 0, radius, startAngle, endAngle);
             ctx.fillStyle = `hsl(${(i * 360) / names.length}, 70%, 60%)`;
             ctx.fill();
 
-            // Draw the name - HORIZONTAL TEXT VERSION
+            // Draw the name
             const textAngle = startAngle + step / 2;
             const name = names[i];
             const fontSize = 16;
@@ -54,8 +60,6 @@ const Wheel = forwardRef<WheelHandle, WheelProps>(({ names, onSpinEnd }, ref) =>
             ctx.save();
             ctx.rotate(textAngle);
             ctx.translate(textRadius, 0);
-
-            // REMOVED the extra rotation that was making text vertical
             ctx.fillStyle = '#fff';
             ctx.font = `${fontSize}px sans-serif`;
             ctx.textAlign = 'center';
